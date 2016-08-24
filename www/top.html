@@ -1,7 +1,5 @@
 <ons-page ng-controller="TopController">
 
-
-	
     <ons-toolbar>
 		<div class="left"><ons-back-button>Back</ons-back-button></div>
 		<div class="center" ng-bind="data.name"></div>
@@ -10,7 +8,7 @@
 			<ons-toolbar-button
                 ng-if="!favorited"
 				ng-click="addFavorite(data.id)">
-				<ons-icon icon="ion-star" alt="お気に入りに追加"></ons-icon>
+				<ons-icon icon="ion-star" alt="お気に入追加"></ons-icon>
 			</ons-toolbar-button>
             <ons-toolbar-button
                 ng-if="favorited"
