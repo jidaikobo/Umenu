@@ -1,0 +1,81 @@
+<ons-page ng-controller="TopController">
+
+    <ons-toolbar>
+		<div class="left"><ons-back-button>Back</ons-back-button></div>
+		<div class="center" ng-bind="data.name"></div>
+        
+    	<div class="right">
+			<ons-toolbar-button
+                ng-if="!favorited"
+				ng-click="addFavorite(data.id)">
+				<ons-icon icon="ion-star" alt="お気に入りに追加"></ons-icon>
+			</ons-toolbar-button>
+            <ons-toolbar-button
+                ng-if="favorited"
+				ng-click="removeFavorite(data.id)">
+				外す
+			</ons-toolbar-button>
+		</div>
+	</ons-toolbar>
+	
+	<ons-tabbar>
+		<ons-tab page="home.html"        icon="ion-home"   label="ホーム" active="true"></ons-tab>
+		<ons-tab page="new_arrival.html" icon="ion-star"   label="新着"                ></ons-tab>
+		<ons-tab page="favorite.html"    icon="ion-star"   label="お気に入り"          ></ons-tab>
+		<ons-tab ng-click="app.slideMenu.toggleMenu()" icon="ion-gear-a" label="メニュー"></ons-tab>
+	</ons-tabbar>
+
+	<ons-template id="home.html">
+		<div>
+			<div ng-repeat="tag in tags"
+				class="tag_list_item"
+				ng-click="pushTagPage(tag)"
+				>
+				<div>
+					<img src="images/menu_icon/{{tag.image}}" alt="{{tag.name}}" />
+					<span>{{tag.name}}</span>
+				</div>
+			</div>
+			
+			<!-- 全て -->
+			<divdiv
+				class="tag_list_item"
+				ng-click="pushTagPage({id: 'all', name:'全て'})"
+				>
+				<div>
+					<img src="images/menu_icon/menu_icon_all.png" alt="{{tag.name}}" />
+					<span>すべて</span>
+				</div>
+			</div>
+		</div>
+	</ons-template>
+	
+	<ons-template id="new_arrival.html">
+		<ons-list>
+			<ons-list-item ng-repeat="new_arrival in new_arrivals"
+				class="list__item__line-height market_list"
+				style="pagging:0; margin:0;width: 100%;"
+				ng-click="pushMenuPage(new_arrival)"
+				>
+				<div>
+				{{new_arrival.name}}
+				</div>
+			</ons-list-item>
+		</ons-list>
+	</ons-template>
+	
+	<ons-template id="favorite.html">
+		<ons-list id="market_list_ul">
+    		<ons-list-item ng-repeat="favorite in favorites"
+				class="list__item__line-height market_list"
+				style="pagging:0; margin:0;width: 100%;"
+	            modifier="tappable"
+	            ng-click="pushMenuPage(favorite)"
+				>
+	            <div>
+	            {{favorite.name}}
+	            </div>
+	        </ons-list-item>
+	    </ons-list>
+	</ons-template>
+</ons-page>
