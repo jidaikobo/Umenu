@@ -5,7 +5,7 @@
 
 		<!-- Menu -->
 		<div class="right">
-			<ons-toolbar-button ng-click="navi.pushPage('menu.html', {animation: 'left'})">
+			<ons-toolbar-button ng-click="navi.pushPage('menu.html', {animation: 'left'})" alt="メニュー">
 				<ons-icon icon="ion-navicon"></ons-icon>
 			</ons-toolbar-button>
 		</div>
@@ -18,7 +18,7 @@
 			>
 			<div>
 				<img src="images/menu_icon/{{category.image}}" alt="{{category.name}}" />
-				<span ng-bind="category.name"></span>
+				<span ng-bind="category.name" aria-hidden="true"></span>
 			</div>
 		</div>
 

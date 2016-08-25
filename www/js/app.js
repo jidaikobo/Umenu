@@ -1,3 +1,6 @@
+const DB_VERSION = 1;
+const STORE_DB_VERSION_KEY  = 'db_version';
+const STORE_INITIALIZED_KEY = 'initialized';
 
 const CATEGORY_ICONS = {
 	1: 'menu_icon_fast_food.png',
@@ -34,7 +37,7 @@ app.factory('Categories', function()
 	categories.data = [];
 
 	// db から categories すべてセット
-	function reset (data)
+	function reset ()
 	{
 		categories.data = [];
 		db().transaction(function(tx)
@@ -50,8 +53,6 @@ app.factory('Categories', function()
 			},
 			function () {  });
 		});
-		console.log(categories.data);
-
 		return categories.data;
 	};
 
@@ -65,11 +66,35 @@ app.factory('Categories', function()
 		return categories.data;
 	}; 
 
-
-	reset();
-
 	return categories;
 });
+
+const MIGRATIONS = [
+	[ // 1
+		'DROP TABLE IF EXISTS favorites',
+		'CREATE TABLE IF NOT EXISTS favorites (' +
+			'item_id INTEGER' +
+			')',
+		'DROP TABLE IF EXISTS items',
+		'CREATE TABLE IF NOT EXISTS items (' +
+			'id            INTEGER,' +
+			'name          TEXT,'    +
+			'created_time  DATETIME NOT NULL DEFAULT "2010-01-01 00:00:00",'    +
+			'contents      TEXT,'    +
+			'pronounce     TEXT'     +
+			')',
+		'DROP TABLE IF EXISTS categories',
+		'CREATE TABLE IF NOT EXISTS categories (' +
+			'id           INTEGER,' +
+			'name         TEXT'     +
+			')',
+		'DROP TABLE IF EXISTS categories_items',
+		'CREATE TABLE IF NOT EXISTS categories_items (' +
+			'category_id    INTEGER,' +
+			'item_id   INTEGER'  +
+			')',
+	],
+];
 
 function db()
 {
@@ -80,13 +105,208 @@ function db()
 		return false;
 	}
 
+
 	return db;
 }
 
+function migration(success_callback, failed_callback)
+{
+	// console.log('migration');
+	var db_version  = localStorage.getItem(STORE_DB_VERSION_KEY);
+	var initialized = localStorage.getItem(STORE_INITIALIZED_KEY);
+
+	// console.log('migration');
+	if (!db_version) db_version = 0;
+	if (!initialized) initialized = 0;
+
+	// console.log('db_version:' + db_version);
+	// console.log('initialized:' + initialized);
+
+	// create
+	db().transaction(function(tx)
+	{
+		while (MIGRATIONS[db_version])
+		{
+			for (var i = 0; i < MIGRATIONS[db_version].length; i++)
+			{
+				sql = MIGRATIONS[db_version][i];
+				tx.executeSql(sql);
+			}
+			db_version++;
+		}
+	},
+	function (err)
+	{
+		console.log(err);
+		console.log('migration transaction failed');
+		// $('#sync_spinner').hide();
+		//
+		failed_callback();
+	},
+	function (res)
+	{
+		// db version を storage に
+		// localStorage.setItem(STORE_DB_VERSION_KEY, db_version);
+
+		console.log('migration transaction success');
+		success_callback()
+		// $('#sync_spinner').hide();
+	});
+}
+
+function sync(success_callback, failed_callback, ajax_failed_callback, ajax_always_callback)
+{
+	$http({
+		mothod: 'GET',
+		url: 'http://www.umenu.jp/api.php'
+	})
+	.success(function (data, status, headers, config)
+	{
+		db().transaction(function(tx)
+		{
+			// favorite は上書きしない
+			tx.executeSql('DELETE FROM items;');
+			tx.executeSql('DELETE FROM categories;');
+			tx.executeSql('DELETE FROM categories_items;');
+
+			if (data.menus)
+			{
+				for (var key in data.menus)
+				{
+					var item = data.menus[key];
+					params = [
+							item.id,
+							item.name,
+							item.created_time,
+							JSON.stringify(item.contents),
+							item.pronounce,
+					];
+					tx.executeSql('INSERT INTO items (id, name, created_time, contents, pronounce) VALUES (?, ?, ?, ?, ?);', params, done, onerror);
+				}
+			}
+			
+			if (data.tags)
+			{
+				for (var key in data.tags)
+				{
+					var category = data.tags[key];
+					params = [
+							category.id,
+							category.name,
+					];
+					tx.executeSql('INSERT INTO categories (id, name) VALUES (?, ?);', params, done, onerror);
+				}
+			}
+			
+			if (data.tags_items)
+			{
+				for (var key in data.tags_items)
+				{
+					var tag_item = data.tags_items[key];
+					params = [
+							tag_item.tag_id,
+							tag_item.controller_id,
+					];
+					tx.executeSql('INSERT INTO categories_items (category_id, item_id) VALUES (?, ?);', params, done, onerror);
+				}
+			}
+		},
+		function (err)
+		{
+			console.log(err);
+			console.log('sync transaction failed');
+			failed_callback();
+		},
+		function (res)
+		{
+			console.log('sync transaction success');
+			success_callback();
+		});
+
+		ajax_always_callback();
+	})
+	.error(function (data, status, headers, config)
+	{
+		console.log('sync ajax failed');
+		ajax_failed_callback();
+		ajax_always_callback();
+	});
+}
+
+/*
+ * td transaction executeSql callback for success
+ */
+function done(tx,results)
+{
+	// alert (results.rows.length);
+}
+
+/*
+ * td transaction executeSql callback for error
+ */
+function onerror(error)
+{
+}
 
 
 app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' , function($scope, $http, SharedData, Categories)
 {
+	console.log('TopController');
+	// アプリの初期化
+	migration(
+		function()
+		{
+			initialize();
+			console.log('migrate success');
+		},
+		function()
+		{
+			console.log('migrate failed');
+		}
+	);
+	// 最後に apply
+
+	function initialize()
+	{
+		var need_sync = true;
+		// init 済みでない もしくは 差分
+		if (need_sync)
+		{
+			sync(
+				// success
+				function ()
+				{
+					console.log('sync success');
+					$scope.categories = Categories.get();
+					new_arrivals();
+					$scope.$apply();
+				},
+				// failed
+				function ()
+				{
+					console.log('sync failed');
+				},
+				// ajax_failed
+				function ()
+				{
+					console.log('ajax failed');
+				},
+				// ajax_always
+				function ()
+				{
+					console.log('sync always');
+				}
+			);
+		}
+		else
+		{
+			$scope.categories = Categories.get();
+			new_arrivals();
+			$scope.$apply();
+		}
+	}
+
+
 	/*
 	 * get new arrival items from db
 	 */
@@ -108,115 +328,6 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 		});
 	}
 
- 
-	/*
-	 * sync server
-	 */
-	function sync ()
-	{
-		// $('#sync_spinner').show();
-
-		$http({
-			mothod: 'GET',
-			url: 'http://www.umenu.jp/api.php'
-		})
-		.success(function (data, status, headers, config)
-		{
-			db().transaction(function(tx)
-			{
-				// favorite は上書きしない
-				tx.executeSql('CREATE TABLE IF NOT EXISTS favorites (' +
-					'item_id INTEGER' +
-					')'
-				);
-				
-				tx.executeSql('DROP TABLE IF EXISTS items');
-				tx.executeSql('CREATE TABLE IF NOT EXISTS items (' +
-					'id            INTEGER,' +
-					'name          TEXT,'    +
-					'created_time  DATETIME NOT NULL DEFAULT "2010-01-01 00:00:00",'    +
-					'contents      TEXT,'    +
-                    'pronounce     TEXT'     +
-					')'
-			    );
-			
-				tx.executeSql('DROP TABLE IF EXISTS categories');
-				tx.executeSql('CREATE TABLE IF NOT EXISTS categories (' +
-					'id           INTEGER,' +
-					'name         TEXT'     +
-					')'
-				);
-
-				tx.executeSql('DROP TABLE IF EXISTS categories_items');
-				tx.executeSql('CREATE TABLE IF NOT EXISTS categories_items (' +
-					'category_id    INTEGER,' +
-					'item_id   INTEGER'  +
-					')'
-				);
-
-				if (data.menus)
-				{
-					for (var key in data.menus)
-					{
-						var item = data.menus[key];
-						params = [
-								item.id,
-								item.name,
-								item.created_time,
-								JSON.stringify(item.contents),
-                                item.pronounce,
-						];
-						tx.executeSql('INSERT INTO items (id, name, created_time, contents, pronounce) VALUES (?, ?, ?, ?, ?);', params, done, onerror);
-					}
-				}
-				
-				if (data.tags)
-				{
-					for (var key in data.tags)
-					{
-						var category = data.tags[key];
-						params = [
-								category.id,
-								category.name,
-						];
-						tx.executeSql('INSERT INTO categories (id, name) VALUES (?, ?);', params, done, onerror);
-					}
-				}
-				
-				if (data.tags_items)
-				{
-					for (var key in data.tags_items)
-					{
-						var tag_item = data.tags_items[key];
-						params = [
-								tag_item.tag_id,
-								tag_item.controller_id,
-						];
-						tx.executeSql('INSERT INTO categories_items (category_id, item_id) VALUES (?, ?);', params, done, onerror);
-					}
-				}
-				
-			},
-			function (err)
-			{
-				console.log(err);
-                console.log('transaction failed');
-				// $('#sync_spinner').hide();
-			},
-			function (res)
-			{
-                console.log('transaction success');
-				$scope.categories = Categories.reset();
-				new_arrivals();
-				// $('#sync_spinner').hide();
-			});
-		})
-		.error(function (data, status, headers, config)
-		{
-			$('#sync_spinner').hide();
-		});
-	}
-
 	/*
 	 * category ページへ
 	 */
@@ -234,30 +345,12 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 		navi.pushPage('item.html');
 	}
 
-	/*
-	 * td transaction executeSql callback for success
-	 */
-	function done(tx,results)
-	{
-		// alert (results.rows.length);
-	}
-
-	/*
-	 * td transaction executeSql callback for error
-	 */
-	function onerror(error)
-	{
-	}
-
 	ons.ready(function ()
 	{
 		// $('#sync_spinner').hide();
-		sync();
+		// sync();
 		// or
 	});
-
-	$scope.categories = Categories.get();
-	new_arrivals();
 }]);
 
 app.controller('MenuController', ['$scope', 'SharedData', 'Categories', function($scope, SharedData, Categories)
