@@ -1,0 +1,39 @@
+<ons-page ng-controller="ItemController" ng-cloak>
+	<!-- toolbar -->
+	<ons-toolbar>
+		<div class="left"><ons-back-button>Back</ons-back-button></div>
+		<div class="center" ng-bind="data.name"></div>
+		
+		<div class="right">
+			<ons-toolbar-button
+				ng-if="!favorited"
+				ng-click="addFavorite(data.id)">
+				<ons-icon icon="ion-star" alt="お気に入りに追加"></ons-icon>
+			</ons-toolbar-button>
+			<ons-toolbar-button
+				ng-if="favorited"
+				ng-click="removeFavorite(data.id)">
+				外す
+			</ons-toolbar-button>
+		</div>
+	</ons-toolbar>
+		
+	</ons-toolbar>
+	<!-- // toolbar -->
+
+	<ul>
+		<li ng-repeat="content in contents">
+			<a ng-if="content.title" ng-bind="content.title" href="#link_{{$index}}"></a>
+		</li>
+	</ul>
+
+	<a class="button icon" href="http://maps.apple.com/maps?q={{data.name}}">
+		<span>MAP</span>
+	</a>
+
+	<div ng-repeat="content in contents" id="link_{{$index}}">
+		<h2 ng-if="content.title" ng-bind="content.title"></h2>
+		<div class="body" ng-bind-html="content.body"></div>
+	</div>
+
+</ons-page>

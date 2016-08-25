@@ -1,0 +1,29 @@
+<ons-page ng-controller="CategoryController">
+
+	<!-- toolbar -->
+	<ons-toolbar>
+		<div class="left" ng-cloak>
+			<ons-toolbar-button ng-click="navi.resetToPage('top.html')">
+				<ons-icon icon="ion-close"></ons-icon>
+			</ons-toolbar-button>
+		</div>
+		<div class="center" ng-bind="data.name" ng-cloak></div>
+	</ons-toolbar>
+	<!-- // toolbar -->
+
+
+   <ons-list id="">
+
+		<ons-list-item ng-repeat="item in items"
+			class="list__item__line-height market_list"
+			style="pagging:0; margin:0;width: 100%;"
+			modifier="tappable"
+			ng-click="showItemPage(item)"
+			>
+			<div>
+			{{item.name}}
+			</div>
+		</ons-list-item>
+		
+	</ons-list>
+</ons-page>

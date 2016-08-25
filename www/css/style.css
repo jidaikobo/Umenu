@@ -7,33 +7,35 @@ li
 
 *
 {
-	color: #664b21
 }
 .page
 {
 	padding: 1em;
 }
-.tab-bar__content .page__background
+.page__background
 {
 	 background-color: #f5f0e1;
 }
-
+.page .navigation-bar
+{
+	background-color: #b33329;
+	color: #ffffff;
+}
 .tab-bar
 {
 	background-color: #b33329;
 }
 
-/*
-.top_component .page__content
+.page__content
 {
 	top: 200px;
+	color: #664b21
 }
-*/
 /*
  * top -> home
  */
-.tag_list_item,
-.list__item.tag_list_item
+.category_list_item,
+.list__item.category_list_item
 {
 	background: transparent;
 	border-bottom: 0 none;
@@ -43,11 +45,11 @@ li
 	max-width: 27.3333%;
 	margin: 3%;
 }
-.tag_list_item img
+.category_list_item img
 {
 	max-width: 100%;
 }
-.tag_list_item span
+.category_list_item span
 {
 	display: block;
 	width: 100%;

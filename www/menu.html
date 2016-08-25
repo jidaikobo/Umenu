@@ -1,39 +1,45 @@
 <ons-page ng-controller="MenuController">
-    <!-- toolbar -->
-    <ons-toolbar>
-		<div class="left"><ons-back-button>Back</ons-back-button></div>
-		<div class="center" ng-bind="data.name"></div>
-        
-    	<div class="right">
-			<ons-toolbar-button
-                ng-if="!favorited"
-				ng-click="addFavorite(data.id)">
-				<ons-icon icon="ion-star" alt="お気に入りに追加"></ons-icon>
-			</ons-toolbar-button>
-            <ons-toolbar-button
-                ng-if="favorited"
-				ng-click="removeFavorite(data.id)">
-				外す
+
+	<ons-toolbar>
+		<div class="center">メニュー</div>
+
+		<!-- close -->
+		<div class="left" ng-cloak>
+			<ons-toolbar-button ng-click="navi.resetToPage('top.html')">
+				<ons-icon icon="ion-close"></ons-icon>
 			</ons-toolbar-button>
 		</div>
 	</ons-toolbar>
-        
-	</ons-toolbar>
-	<!-- // toolbar -->
 
-    <ul>
-        <li ng-repeat="content in contents">
-            <a ng-if="content.title" ng-bind="content.title" href="#link_{{$index}}"></a>
-        </li>
-    </ul>
 
-	<a class="button icon" href="http://maps.apple.com/maps?q={{data.name}}">
-		<span>MAP</span>
-	</a>
 
-    <div ng-repeat="content in contents" id="link_{{$index}}">
-        <h2 ng-if="content.title" ng-bind="content.title"></h2>
-        <div class="body" ng-bind-html="content.body"></div>
-    </div>
+	<ons-list>
+		<ons-list-item
+			modifier="tappable" class="list__item__line-height"
+			ng-click="app.resetToPage('top.html')"
+		>
+			<ons-icon icon="ion-home" style="color: #666;"></ons-icon> トップ
+		</ons-list-item>
+
+		<ons-list-item  ng-repeat="menu in menuList"
+			modifier="tappable" class="list__item__line-height"
+			ng-click="app.slidingMenu.setMainPage(menu.page, {closeMenu:true})">
+			<span style="margin-left: 10px;">
+				<ons-icon icon="ion-image" style="color: #666;"></ons-icon>
+				{{menu.name}}
+			</span>
+		</ons-list-item>
+		
+		<ons-list-item ng-repeat="data in dataList"
+			modifier="tappable" class="list__item__line-height"
+			ng-click="showDetailPage(data)">
+			<span style="margin-left: 10px;">
+				<ons-icon icon="ion-image" style="color: #666;"></ons-icon>
+					{{data.name}}
+			</span>
+		</ons-list-item>
+	</ons-list>
+
+
 
 </ons-page>
