@@ -11,7 +11,7 @@
 		</div>
 	</ons-toolbar>
 
-	<div>
+	<div class="padding_normal">
 		<div ng-repeat="category in categories"
 			class="category_list_item"
 			ng-click="pushCategoryPage(category)"
@@ -35,18 +35,19 @@
 	</div>
 
 	<!-- 新着 -->
-	<div style="height: 300px; overflow:hidden;">
-		新着
-		<ul>
-			<li ng-repeat="new_arrival in new_arrivals"
-				class="list__item__line-height market_list"
-				style="pagging:0; margin:0;width: 100%;"
-				ng-click="pushItemPage(new_arrival)"
-				>
-				<div ng-bind="new_arrival.name">
-				</div>
-			</li>
-		</ons-list>
-	</ul>
+	<div class="padding_normal new_arrival">
+		<h2>新着</h2>
+
+	<ons-list>
+		<ons-list-item ng-repeat="new_arrival in new_arrivals"
+			class="list__item__line-height"
+			style="pagging:0; margin:0;width: 100%;"
+			modifier="tappable"
+			ng-click="pushItemPage(new_arrival)"
+			>
+			<ons-icon icon="ion-android-arrow-dropright-circle"></ons-icon>&nbsp;
+			<span ng-bind="new_arrival.name"></span>
+		</ons-list-item>
+	</ons-list>
 
 </ons-page>

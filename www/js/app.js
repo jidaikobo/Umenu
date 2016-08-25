@@ -252,7 +252,7 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 	ons.ready(function ()
 	{
 		// $('#sync_spinner').hide();
-	//	sync();
+		sync();
 		// or
 	});
 
