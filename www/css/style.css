@@ -21,6 +21,11 @@ li
 	background-color: #b33329;
 	color: #ffffff;
 }
+.navigation-bar__item, .navigation-bar__left, .navigation-bar__right, .navigation-bar__center,
+.toolbar-button, .toolbar-button--outline, .toolbar-button--quiet
+{
+	color: #ffffff;
+}
 .tab-bar
 {
 	background-color: #b33329;

@@ -11,41 +11,42 @@
 		</div>
 	</ons-toolbar>
 
-		<div>
-			<div ng-repeat="category in categories"
-				class="category_list_item"
-				ng-click="pushCategoryPage(category)"
-				>
-				<div>
-					<img src="images/menu_icon/{{category.image}}" alt="{{category.name}}" />
-					<span ng-bind="category.name"></span>
-				</div>
-			</div>
-
-			<!-- 全て -->
-			<div
-				class="category_list_item"
-				ng-click="pushCategoryPage({id: 'all', name:'すべて'})"
-				>
-				<div>
-					<img src="images/menu_icon/menu_icon_all.png" alt="すべて" />
-					<span>すべて</span>
-				</div>
+	<div>
+		<div ng-repeat="category in categories"
+			class="category_list_item"
+			ng-click="pushCategoryPage(category)"
+			>
+			<div>
+				<img src="images/menu_icon/{{category.image}}" alt="{{category.name}}" />
+				<span ng-bind="category.name"></span>
 			</div>
 		</div>
 
+		<!-- 全て -->
+		<div
+			class="category_list_item"
+			ng-click="pushCategoryPage({id: 'all', name:'すべて'})"
+			>
+			<div>
+				<img src="images/menu_icon/menu_icon_all.png" alt="すべて" />
+				<span>すべて</span>
+			</div>
+		</div>
+	</div>
+
 	<!-- 新着 -->
 	<div style="height: 300px; overflow:hidden;">
-		<ons-list>
-			<ons-list-item ng-repeat="new_arrival in new_arrivals"
+		新着
+		<ul>
+			<li ng-repeat="new_arrival in new_arrivals"
 				class="list__item__line-height market_list"
 				style="pagging:0; margin:0;width: 100%;"
 				ng-click="pushItemPage(new_arrival)"
 				>
 				<div ng-bind="new_arrival.name">
 				</div>
-			</ons-list-item>
+			</li>
 		</ons-list>
-	</div>
+	</ul>
 
 </ons-page>

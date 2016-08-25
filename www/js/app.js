@@ -28,6 +28,49 @@ app.factory('SharedData', function()
 	return sharedData;
 });
 
+app.factory('Categories', function()
+{
+	var categories = {};
+	categories.data = [];
+
+	// db から categories すべてセット
+	function reset (data)
+	{
+		categories.data = [];
+		db().transaction(function(tx)
+		{
+			tx.executeSql('SELECT * FROM categories', [], function (tx, results)
+			{
+				for (var i = 0; i < results.rows.length; i++) {
+					var row = results.rows.item(i);
+					
+					row.image = CATEGORY_ICONS[row.id];
+					categories.data.push(row);
+				}
+			},
+			function () {  });
+		});
+		console.log(categories.data);
+
+		return categories.data;
+	};
+
+	categories.reset = function()
+	{
+		return reset();
+	}
+
+	categories.get = function()
+	{
+		return categories.data;
+	}; 
+
+
+	reset();
+
+	return categories;
+});
+
 function db()
 {
 	var db = window.openDatabase("com.jidaikobo.umenu", "1.0", "test database", 1000000);
@@ -42,33 +85,8 @@ function db()
 
 
 
-app.controller('TopController', ['$scope', '$http', 'SharedData' , function($scope, $http, SharedData)
+app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' , function($scope, $http, SharedData, Categories)
 {
-
-	console.debug('console debug');
-	console.warn('console debug');
-	/*
-	 * get categories from db
-	 */
-	function categories()
-	{
-		$scope.categories = [];
-		db().transaction(function(tx)
-		{
-			tx.executeSql('SELECT * FROM categories', [], function (tx, results)
-			{
-				for (var i = 0; i < results.rows.length; i++) {
-					var row = results.rows.item(i);
-					
-					row.image = CATEGORY_ICONS[row.id];
-					$scope.categories.push(row);
-				}
-				$scope.$apply();
-			},
-			function () {  });
-		});
-	}
-
 	/*
 	 * get new arrival items from db
 	 */
@@ -89,37 +107,8 @@ app.controller('TopController', ['$scope', '$http', 'SharedData' , function($sco
 			function () {  });
 		});
 	}
-	
-	/*
-	 * get favorites from db
-	 */
-	 	function favorites()
-	{
-		db().transaction(function(tx)
-		{
-			$scope.favorites = [];
-			tx.executeSql('SELECT * FROM items, favorites WHERE favorites.item_id = items.id;', [], function (tx, results)
-			{
-				var ids = [];
-				for (var i = 0; i < results.rows.length; i++) {
-					var row = results.rows.item(i);
-					$scope.favorites.push(row);
-				}
-				$scope.$apply();
-			});
-		});
-	}
 
-	/*
-	 * メニュー個票でお気に入り追加・削除が行われた物を反映する
-	 */
-	$scope.$on('favoriteChanged', function(e)
-	{
-		console.log('favoriteChanged');
-		favorites();
-	});
-	 
-	 
+ 
 	/*
 	 * sync server
 	 */
@@ -217,9 +206,8 @@ app.controller('TopController', ['$scope', '$http', 'SharedData' , function($sco
 			function (res)
 			{
                 console.log('transaction success');
-				categories();
+				$scope.categories = Categories.reset();
 				new_arrivals();
-				favorites();
 				// $('#sync_spinner').hide();
 			});
 		})
@@ -263,22 +251,28 @@ app.controller('TopController', ['$scope', '$http', 'SharedData' , function($sco
 
 	ons.ready(function ()
 	{
-		$('#sync_spinner').hide();
-		sync();
+		// $('#sync_spinner').hide();
+	//	sync();
 		// or
-		categories();
-		new_arrivals();
-		favorites();
 	});
-	
+
+	$scope.categories = Categories.get();
+	new_arrivals();
 }]);
 
-app.controller('MenuController', ['$scope', function($scope)
+app.controller('MenuController', ['$scope', 'SharedData', 'Categories', function($scope, SharedData, Categories)
 {
 	$scope.push = function()
 	{
 		console.log('pushed');
 	};
+
+	$scope.pushCategoryPage = function (category)
+	{
+		SharedData.set(category);
+		navi.pushPage('category.html');
+	}
+	$scope.categories = Categories.get();
 }]);
 
 app.controller('CategoryController', ['$scope', 'SharedData', function($scope, SharedData)
@@ -323,6 +317,9 @@ app.controller('CategoryController', ['$scope', 'SharedData', function($scope, S
 
 }]);
 
+/*
+ * ItemController
+ */
 app.controller('ItemController', ['$scope', 'SharedData', '$rootScope', function($scope, SharedData, $rootScope)
 {
 	$scope.data      = SharedData.get();
@@ -399,6 +396,46 @@ app.controller('ItemController', ['$scope', 'SharedData', '$rootScope', function
 		navi.off('postpop');
 	});
 }]);
+
+
+
+/*
+ * FavoriteController
+ */
+app.controller('FavoriteController', ['$scope', 'SharedData', '$rootScope', function($scope, SharedData, $rootScope)
+{
+	/*
+	 * get favorites from db
+	 */
+	function favorites()
+	{
+		db().transaction(function(tx)
+		{
+			$scope.favorites = [];
+			tx.executeSql('SELECT * FROM items, favorites WHERE favorites.item_id = items.id;', [], function (tx, results)
+			{
+				var ids = [];
+				for (var i = 0; i < results.rows.length; i++) {
+					var row = results.rows.item(i);
+					$scope.favorites.push(row);
+				}
+				$scope.$apply();
+			});
+		});
+	}
+
+	/*
+	 * メニュー個票でお気に入り追加・削除が行われた物を反映する
+	 */
+	$scope.$on('favoriteChanged', function(e)
+	{
+		console.log('favoriteChanged');
+		favorites();
+	});
+ 
+	favorites();
+}]);
+
 
 var isJson = function(arg)
 {

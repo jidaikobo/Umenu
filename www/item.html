@@ -1,7 +1,13 @@
 <ons-page ng-controller="ItemController" ng-cloak>
 	<!-- toolbar -->
 	<ons-toolbar>
-		<div class="left"><ons-back-button>Back</ons-back-button></div>
+		<div class="left" ng-cloak>
+			<ons-toolbar-button ng-click="navi.popPage()">
+				<ons-icon icon="ion-close"></ons-icon>
+			</ons-toolbar-button>
+		</div>
+
+
 		<div class="center" ng-bind="data.name"></div>
 		
 		<div class="right">

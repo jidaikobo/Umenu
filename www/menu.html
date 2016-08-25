@@ -12,13 +12,22 @@
 	</ons-toolbar>
 
 
-
 	<ons-list>
 		<ons-list-item
 			modifier="tappable" class="list__item__line-height"
 			ng-click="app.resetToPage('top.html')"
 		>
 			<ons-icon icon="ion-home" style="color: #666;"></ons-icon> トップ
+		</ons-list-item>
+
+		<ons-list-item  ng-repeat="category in categories"
+			modifier="tappable"
+			class="list__item__line-height"
+			ng-click="pushCategoryPage(category)">
+			<span style="margin-left: 10px;">
+				<ons-icon icon="ion-image" style="color: #666;"></ons-icon>
+				{{category.name}}
+			</span>
 		</ons-list-item>
 
 		<ons-list-item  ng-repeat="menu in menuList"
@@ -29,6 +38,8 @@
 				{{menu.name}}
 			</span>
 		</ons-list-item>
+		
+
 		
 		<ons-list-item ng-repeat="data in dataList"
 			modifier="tappable" class="list__item__line-height"
