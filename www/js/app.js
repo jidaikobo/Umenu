@@ -10,6 +10,13 @@ const CATEGORY_ICONS = {
 	5: 'menu_icon_bar.png',
 };
 
+const PAGES = [
+	{ name: 'ユーメニューとは', url: 'page/about.html', icon: '' },
+	{ name: '利用上の注意',     url: 'page/what_umenu_is_not.html', icon: '' },
+	{ name: 'お店のかたへ',     url: 'page/shop_owners.html', icon: '' },
+	{ name: '企画・運用',       url: 'page/planning_operation.html', icon: '' },
+	{ name: '個人情報について', url: 'page/privacy.html', icon: '' },
+];
 const SYNC_AUTO  = 2; // オートで走る
 const SYNC_ALLOW = 1; // 許可したとき、ボタンを押した時に走る
 const SYNC_DENY  = 0; // 走らない
@@ -391,6 +398,7 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 app.controller('MenuController', ['$scope', 'SharedData', 'Categories', function($scope, SharedData, Categories)
 {
 	$scope.categories = Categories.get();
+	$scope.pages = PAGES;
 
 	console.log($scope.categories);
 
@@ -520,7 +528,7 @@ app.controller('ItemController', ['$scope', 'SharedData', '$rootScope', function
 	navi.on("prepop", function(e)
 	{
 		// if (e.leavePage.name == "b.html")
-		if (e.enterPage.name == 'top_component.html')
+		if (e.enterPage.name == 'favorite.html')
 		{
 			$rootScope.$broadcast('favoriteChanged', {});
 		}
@@ -554,6 +562,12 @@ app.controller('FavoriteController', ['$scope', 'SharedData', '$rootScope', func
 			});
 		});
 	}
+
+	$scope.pushMenuPage = function (data)
+	{
+		SharedData.set(data);
+		navi.pushPage('item.html');
+	};
 
 	/*
 	 * メニュー個票でお気に入り追加・削除が行われた物を反映する

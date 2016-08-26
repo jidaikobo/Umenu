@@ -1,5 +1,16 @@
-<ons-page ng-controller="FavoriteCOntroller">
-	<ons-list id="market_list_ul">
+<ons-page ng-controller="FavoriteController">
+	<ons-toolbar>
+		<div class="center">お気に入り</div>
+
+		<!-- close -->
+		<div class="left" ng-cloak>
+			<ons-toolbar-button ng-click="navi.resetToPage('top.html')">
+				<ons-icon icon="ion-close-round"></ons-icon>
+			</ons-toolbar-button>
+		</div>
+	</ons-toolbar>
+
+	<ons-list>
 		<ons-list-item ng-repeat="favorite in favorites"
 			class="list__item__line-height"
 			style="pagging:0; margin:0;width: 100%;"

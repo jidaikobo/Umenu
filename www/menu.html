@@ -6,7 +6,7 @@
 		<!-- close -->
 		<div class="left" ng-cloak>
 			<ons-toolbar-button ng-click="navi.resetToPage('top.html')">
-				<ons-icon icon="ion-close"></ons-icon>
+				<ons-icon icon="ion-close-round"></ons-icon>
 			</ons-toolbar-button>
 		</div>
 	</ons-toolbar>
@@ -17,7 +17,15 @@
 			modifier="tappable" class="list__item__line-height"
 			ng-click="app.resetToPage('top.html')"
 		>
-			<ons-icon icon="ion-home" style="color: #666;"></ons-icon> トップ
+			<ons-icon icon="ion-home" style="color: #666;"></ons-icon>&nbsp;トップ
+		</ons-list-item>
+
+		<ons-list-item
+			modifier="tappable"
+			class="list__item__line-height"
+			ng-click="navi.pushPage('favorite.html')">
+				<ons-icon icon="ion-star" style="color: #666;"></ons-icon>&nbsp;
+					お気に入り
 		</ons-list-item>
 
 		<ons-list-item  ng-repeat="category in categories"
@@ -25,29 +33,17 @@
 			class="list__item__line-height"
 			ng-click="pushCategoryPage(category)">
 			<span style="margin-left: 10px;">
-				<ons-icon icon="ion-android-arrow-dropright-circle" style="color: #666;"></ons-icon>
+				<ons-icon icon="ion-android-arrow-dropright-circle" style="color: #666;"></ons-icon>&nbsp;
 				{{category.name}}
 			</span>
 		</ons-list-item>
 
-		<ons-list-item  ng-repeat="menu in menuList"
-			modifier="tappable" class="list__item__line-height"
-			ng-click="app.slidingMenu.setMainPage(menu.page, {closeMenu:true})">
-			<span style="margin-left: 10px;">
-				<ons-icon icon="ion-image" style="color: #666;"></ons-icon>
-				{{menu.name}}
-			</span>
-		</ons-list-item>
-		
-
-		
-		<ons-list-item ng-repeat="data in dataList"
-			modifier="tappable" class="list__item__line-height"
-			ng-click="showDetailPage(data)">
-			<span style="margin-left: 10px;">
-				<ons-icon icon="ion-image" style="color: #666;"></ons-icon>
-					{{data.name}}
-			</span>
+		<ons-list-item ng-repeat="page in pages"
+			modifier="tappable"
+			class="list__item__line-height"
+			ng-click="navi.pushPage(page.url)">
+				<ons-icon icon="ion-document" style="color: #666;"></ons-icon>&nbsp;
+					{{page.name}}
 		</ons-list-item>
 	</ons-list>
 
