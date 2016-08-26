@@ -10,6 +10,13 @@ const CATEGORY_ICONS = {
 	5: 'menu_icon_bar.png',
 };
 
+const SYNC_AUTO  = 2; // オートで走る
+const SYNC_ALLOW = 1; // 許可したとき、ボタンを押した時に走る
+const SYNC_DENY  = 0; // 走らない
+
+const CONNECTION_WIFI = "wifi";
+const CONNECTION_NONE = "none";
+
 var app = ons.bootstrap('myApp', [ 'ngSanitize' ]);
 
 app.factory('SharedData', function()
@@ -39,7 +46,7 @@ app.factory('Categories', function()
 
 	categories.set = function(data)
 	{
-		categories.data;
+		categories.data = data;
 	}
 
 	categories.get = function()
@@ -86,22 +93,14 @@ function db()
 		return false;
 	}
 
-
 	return db;
 }
 
 function migration(success_callback, failed_callback)
 {
-	// console.log('migration');
 	var db_version  = localStorage.getItem(STORE_DB_VERSION_KEY);
-	var initialized = localStorage.getItem(STORE_INITIALIZED_KEY);
 
-	// console.log('migration');
 	if (!db_version) db_version = 0;
-	if (!initialized) initialized = 0;
-
-	// console.log('db_version:' + db_version);
-	// console.log('initialized:' + initialized);
 
 	// create
 	db().transaction(function(tx)
@@ -120,8 +119,6 @@ function migration(success_callback, failed_callback)
 	{
 		console.log(err);
 		console.log('migration transaction failed');
-		// $('#sync_spinner').hide();
-		//
 		failed_callback();
 	},
 	function (res)
@@ -131,7 +128,6 @@ function migration(success_callback, failed_callback)
 
 		console.log('migration transaction success');
 		success_callback()
-		// $('#sync_spinner').hide();
 	});
 }
 
@@ -256,36 +252,74 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 		categories();
 		new_arrivals();
 
-		var need_sync = true;
+		var initialized = localStorage.getItem(STORE_INITIALIZED_KEY);
+		if (!initialized) initialized = 0;
 
-		// init 済みでない もしくは 差分
-		if (need_sync)
+		if (navigator.connection.type == 'hoge') // WIFI 環境
+		// if (navigator.connection.type == CONNECTION_WIFI) // WIFI 環境
 		{
-			sync(
-				// success
-				function ()
-				{
-					console.log('sync success');
-					categories();
-					new_arrivals();
-				},
-				// failed
-				function ()
-				{
-					console.log('sync failed');
-				},
-				// ajax_failed
-				function ()
-				{
-					console.log('ajax failed');
-				},
-				// ajax_always
-				function ()
-				{
-					console.log('sync always');
-				}
-			);
+			// auto で走る
+			executeSync();
 		}
+		else if (navigator.connection.type == CONNECTION_NONE) // オフライン
+		{
+			if (!initialized) // initialized がまだの時は警告を
+			{
+				ons.notification.alert({
+					title: 'データの取得が出来ません',
+					messageHTML: "オフラインの為、データの取得が出来ませんでした。<br>通信環境の良い所で、ページ内の「データの同期」ボタンで、初期化を実行して下さい。",
+				});
+
+			}
+		}
+		else // オンライン
+		{
+
+			console.log('initialized: ' + initialized);
+			if (!initialized) // initialized がまだの時は、確認をする
+			{
+				ons.notification.confirm({
+					title: 'データの取得',
+					messageHTML: "モバイル通信環境です。<br>データの取得を行ってもよろしいですか?",
+					callback: function(answer)
+					{
+						if (answer)
+						{
+							executeSync();
+						}
+					}
+				});
+			}
+		}
+	}
+
+	function executeSync()
+	{
+		sync(
+			// success
+			function ()
+			{
+				console.log('sync success');
+				localStorage.setItem(STORE_INITIALIZED_KEY, 1);
+				categories();
+				new_arrivals();
+			},
+			// failed
+			function ()
+			{
+				console.log('sync failed');
+			},
+			// ajax_failed
+			function ()
+			{
+				console.log('ajax failed');
+			},
+			// ajax_always
+			function ()
+			{
+				console.log('sync always');
+			}
+		);
 	}
 
 	/*
@@ -352,17 +386,14 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 		SharedData.set(item);
 		navi.pushPage('item.html');
 	}
-
-	ons.ready(function ()
-	{
-		// $('#sync_spinner').hide();
-		// sync();
-		// or
-	});
 }]);
 
 app.controller('MenuController', ['$scope', 'SharedData', 'Categories', function($scope, SharedData, Categories)
 {
+	$scope.categories = Categories.get();
+
+	console.log($scope.categories);
+
 	$scope.push = function()
 	{
 		console.log('pushed');
@@ -373,7 +404,6 @@ app.controller('MenuController', ['$scope', 'SharedData', 'Categories', function
 		SharedData.set(category);
 		navi.pushPage('category.html');
 	}
-	$scope.categories = Categories.get();
 }]);
 
 app.controller('CategoryController', ['$scope', 'SharedData', function($scope, SharedData)
