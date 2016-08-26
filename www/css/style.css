@@ -2,11 +2,11 @@
 
 @font-face {
 	font-family: 'GenJyuuGothic-Medium';
-	src: url('fonts/GenJyuuGothic-Medium.ttf') format('truetype');
+	src: url('../fonts/GenJyuuGothic-Medium.ttf') format('truetype');
 }
 *
 {
-	font-family: 'GenJyuuGothic-Medium', "ヒラギノ明朝 ProN W6", "HiraMinProN-W6", "HG明朝E", "ＭＳ Ｐ明朝", "MS PMincho", "MS 明朝", serif;
+	font-family: 'GenJyuuGothic-Medium';
 	line-height: 1.5;
 	padding:0;
 	margin: 0;
