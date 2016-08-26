@@ -156,12 +156,13 @@ function migration(success_callback, failed_callback)
 
 function sync(success_callback, failed_callback, ajax_failed_callback, ajax_always_callback)
 {
-	$http({
-		mothod: 'GET',
-		url: 'http://www.umenu.jp/api.php'
-	})
-	.success(function (data, status, headers, config)
+	console.log('run sync');
+	
+	$.get('http://www.umenu.jp/api.php'
+	)
+	.done(function (data)
 	{
+		console.log('ajax ok');
 		db().transaction(function(tx)
 		{
 			// favorite は上書きしない
@@ -222,14 +223,15 @@ function sync(success_callback, failed_callback, ajax_failed_callback, ajax_alwa
 			console.log('sync transaction success');
 			success_callback();
 		});
-
-		ajax_always_callback();
 	})
-	.error(function (data, status, headers, config)
+	.fail(function (response)
 	{
 		console.log('sync ajax failed');
 		ajax_failed_callback();
-		ajax_always_callback();
+	})
+	.always(function (response)
+	{
+		ajax_always_callback();		
 	});
 }
 
