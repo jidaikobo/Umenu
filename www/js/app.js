@@ -36,29 +36,10 @@ app.factory('Categories', function()
 	var categories = {};
 	categories.data = [];
 
-	// db から categories すべてセット
-	function reset ()
-	{
-		categories.data = [];
-		db().transaction(function(tx)
-		{
-			tx.executeSql('SELECT * FROM categories', [], function (tx, results)
-			{
-				for (var i = 0; i < results.rows.length; i++) {
-					var row = results.rows.item(i);
-					
-					row.image = CATEGORY_ICONS[row.id];
-					categories.data.push(row);
-				}
-			},
-			function () {  });
-		});
-		return categories.data;
-	};
 
-	categories.reset = function()
+	categories.set = function(data)
 	{
-		return reset();
+		categories.data;
 	}
 
 	categories.get = function()
@@ -146,7 +127,7 @@ function migration(success_callback, failed_callback)
 	function (res)
 	{
 		// db version を storage に
-		// localStorage.setItem(STORE_DB_VERSION_KEY, db_version);
+		localStorage.setItem(STORE_DB_VERSION_KEY, db_version);
 
 		console.log('migration transaction success');
 		success_callback()
@@ -163,6 +144,8 @@ function sync(success_callback, failed_callback, ajax_failed_callback, ajax_alwa
 	.done(function (data)
 	{
 		console.log('ajax ok');
+		data = JSON.parse(data);
+		console.log(data.tags);
 		db().transaction(function(tx)
 		{
 			// favorite は上書きしない
@@ -185,7 +168,7 @@ function sync(success_callback, failed_callback, ajax_failed_callback, ajax_alwa
 					tx.executeSql('INSERT INTO items (id, name, created_time, contents, pronounce) VALUES (?, ?, ?, ?, ?);', params, done, onerror);
 				}
 			}
-			
+
 			if (data.tags)
 			{
 				for (var key in data.tags)
@@ -231,7 +214,7 @@ function sync(success_callback, failed_callback, ajax_failed_callback, ajax_alwa
 	})
 	.always(function (response)
 	{
-		ajax_always_callback();		
+		ajax_always_callback();
 	});
 }
 
@@ -270,7 +253,11 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 
 	function initialize()
 	{
+		categories();
+		new_arrivals();
+
 		var need_sync = true;
+
 		// init 済みでない もしくは 差分
 		if (need_sync)
 		{
@@ -279,9 +266,8 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 				function ()
 				{
 					console.log('sync success');
-					$scope.categories = Categories.get();
+					categories();
 					new_arrivals();
-					$scope.$apply();
 				},
 				// failed
 				function ()
@@ -300,12 +286,32 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 				}
 			);
 		}
-		else
+	}
+
+	/*
+	 * get categories from db
+	 * and set shared categories data
+	 */
+	function categories()
+	{
+		db().transaction(function(tx)
 		{
-			$scope.categories = Categories.get();
-			new_arrivals();
-			$scope.$apply();
-		}
+			tx.executeSql('SELECT * FROM categories', [], function (tx, results)
+			{
+				var categories = [];
+				for (var i = 0; i < results.rows.length; i++) {
+					var row = results.rows.item(i);
+					row.image = CATEGORY_ICONS[row.id];
+					categories.push(row);
+
+				}
+				Categories.set(categories);
+				$scope.categories = categories;
+				console.log($scope.categories);
+				$scope.$apply();
+			},
+			function () {  });
+		});
 	}
 
 
