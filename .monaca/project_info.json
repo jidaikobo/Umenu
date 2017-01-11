@@ -16,7 +16,8 @@
         "cordova-plugin-whitelist@1.2.2",
         "cordova-plugin-splashscreen@3.2.2",
         "cordova-plugin-network-information@1.2.1",
-        "cordova-custom-config@2.0.3"
+        "cordova-custom-config@2.0.3",
+        "cordova-plugin-dialogs@1.2.1"
     ],
     "title-ja": "UMenu for Local",
     "title-en": "",

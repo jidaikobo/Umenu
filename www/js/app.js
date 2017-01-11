@@ -262,13 +262,13 @@ app.controller('TopController', ['$scope', '$http', 'SharedData', 'Categories' ,
 		var initialized = localStorage.getItem(STORE_INITIALIZED_KEY);
 		if (!initialized) initialized = 0;
 
-		if (navigator.connection.type == 'hoge') // WIFI 環境
-		// if (navigator.connection.type == CONNECTION_WIFI) // WIFI 環境
+		if (navigator.connection.type == 'wifi') // WIFI 環境
 		{
 			// auto で走る
+			console.log('data sync by wifi');
 			executeSync();
 		}
-		else if (navigator.connection.type == CONNECTION_NONE) // オフライン
+		else if (navigator.connection.type == 'none') // オフライン
 		{
 			if (!initialized) // initialized がまだの時は警告を
 			{
@@ -494,10 +494,14 @@ app.controller('ItemController', ['$scope', 'SharedData', '$rootScope', function
 			{
 				$scope.favorited = true;
 				$scope.$apply();
+				navigator.notification.alert($scope.data.name + 'お気に入りに追加しました', function() {}, 'お気に入りに追加');
+				/*
 				ons.notification.alert({
 					title: 'お気に入りに追加',
 					message: $scope.data.name + 'お気に入りに追加しました',
 				});
+				*/
+				// alert($scope.data.name + 'お気に入りに追加しました');
 			});
 		});
 	};
@@ -581,6 +585,69 @@ app.controller('FavoriteController', ['$scope', 'SharedData', '$rootScope', func
 	favorites();
 }]);
 
+/*
+app.controller('PlanningOperationController', ['$scope', function($scope)
+{
+	$scope.openBrowser = function(url)
+	{
+		window.open(url, '_system');
+	}
+
+	$scope.call = call;
+	$scope.mail = mail;
+}]);
+
+var call = function(tel)
+{
+	if ( monaca.isAndroid )
+	{
+		window.plugins.webintent.startActivity(
+			{
+				action: window.plugins.webintent.ACTION_VIEW,
+				url: 'tel: ' + tel
+			},
+			function() {},
+			function() {alert('Failed to open URL via Android Intent')}
+		);
+		console.log('Android');
+	}
+	else
+	{
+		ons.notification.confirm({
+			title: tel,
+			messageHTML: "に電話をしもよろしいですか?",
+			callback: function(answer)
+			{
+				if (answer)
+				{
+					var ref = cordova.InAppBrowser.open('tel:'+tel, '_system');
+				}
+			},
+			buttonLabels: ['キャンセル', '発信']
+		});
+	}
+}
+
+var mail = function(address, subject, body)
+{
+	if ( monaca.isAndroid )
+	{
+		window.plugins.webintent.startActivity(
+			{
+				action: window.plugins.webintent.ACTION_VIEW,
+				url: 'mailto:' + address + '?subject=' + subject + '&body=' + body + ''
+			},
+			function() {},
+			function() {alert('Failed to open URL via Android Intent')}
+		);
+		console.log('Android');
+	}
+	else
+	{
+		var ref = cordova.InAppBrowser.open('mailto:' + address + '?subject=' + subject + '&body=' + body + '', '_system');
+	}
+}
+*/
 
 var isJson = function(arg)
 {

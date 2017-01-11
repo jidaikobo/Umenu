@@ -3,7 +3,7 @@
 	<ons-toolbar>
 		<div class="left" ng-cloak>
 			<ons-toolbar-button ng-click="navi.popPage()">
-				<ons-icon icon="ion-close-round"></ons-icon>
+				<img src="images/bar_icon/close.png" alt="閉じる" class="bar_icon">
 			</ons-toolbar-button>
 		</div>
 
@@ -13,32 +13,37 @@
 			<ons-toolbar-button
 				ng-if="!favorited"
 				ng-click="addFavorite(data.id)">
-				<ons-icon icon="ion-star" alt="お気に入りに追加"></ons-icon>
+				<img src="images/bar_icon/add_favorite.png" alt="お気に入りに追加" class="bar_icon">
 			</ons-toolbar-button>
 			<ons-toolbar-button
 				ng-if="favorited"
 				ng-click="removeFavorite(data.id)">
-				外す
+				<img src="images/bar_icon/remove_favorite.png" alt="お気に入りから外す" class="bar_icon">
 			</ons-toolbar-button>
 		</div>
 	</ons-toolbar>
 		
 	</ons-toolbar>
 	<!-- // toolbar -->
-	<h1 ng-bind="data.name"></h1>
-	<ul>
-		<li ng-repeat="content in contents">
-			<a ng-if="content.title" ng-bind="content.title" href="#link_{{$index}}"></a>
-		</li>
-	</ul>
+	
+	<div class="main_content">
+		<h1><img src="images/item_h1.png" aria-hidden="true" style="max-height: 1.2em; vertical-align: middle;margin-right: 6px;">{{data.name}}</h1>
+		<ul style="margin-bottom:1em;">
+			<li ng-repeat="content in contents" style="font-size: 110%; margin-bottom:0.5em;">
+				<ons-icon icon="ion-android-arrow-dropright-circle" tabindex="-1" aria-hidden="true"></ons-icon>&nbsp;
+				<a ng-if="content.title" ng-bind="content.title" href="#link_{{$index}}"></a>
+			</li>
+		</ul>
+	
+		<a class="button icon" href="http://maps.apple.com/maps?q={{data.name}}">
+			<span>MAP</span>
+		</a>
 
-	<a class="button icon" href="http://maps.apple.com/maps?q={{data.name}}">
-		<span>MAP</span>
-	</a>
 
-	<div ng-repeat="content in contents" id="link_{{$index}}">
-		<h2 ng-if="content.title" ng-bind="content.title"></h2>
-		<div class="body" ng-bind-html="content.body"></div>
+		<div ng-repeat="content in contents" id="link_{{$index}}" class="item_content">
+			<h2 ng-if="content.title" ng-bind="content.title"></h2>
+			<div class="body" ng-bind-html="content.body"></div>
+		</div>
 	</div>
 
 </ons-page>

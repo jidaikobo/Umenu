@@ -18,18 +18,24 @@ ul li
 }
 h1
 {
-	font-size: 120%;
+	font-size: 144%;
 	margin-bottom: 1em;
+	border-bottom: 1px solid #999;
 }
 h2
 {
-	font-size: 110%;
+	color: #b33329;
+	font-size: 144%;
 	margin-top: 1.5em;
 	margin-bottom: 1em;
+	border-bottom: 1px solid #999;
 }
 h3
 {
+	font-size: 108%;
+	background-color: #f0f0f0;
 	font-weight: bold;
+	padding: 0.3em 0.7em;
 	margin-top: 1.5em;
 	margin-bottom: 1em;
 }
@@ -86,6 +92,10 @@ dd
 {
 	padding: 10px 9px;
 }
+.main_content
+{
+	padding: 1em 0.5em 3em;
+}
 
 .page
 {
@@ -109,10 +119,13 @@ dd
 {
 	background-color: #b33329;
 }
-
 .page__content
 {
 	color: #664b21;
+}
+.bar_icon
+{
+	height: 32px;
 }
 /*
  * top -> home
@@ -155,4 +168,22 @@ dd
 .new_arrival ul li
 {
 	margin: 0;
+}
+
+/*
+ * item
+ */
+.item_content
+{
+	margin-top: 1em;
+	background-color: #ffffff;
+	padding: 0.5em;
+}
+.item_content h1
+{
+	padding-left: 1em;
+}
+.item_content h2
+{
+	margin-top: 0;
 }

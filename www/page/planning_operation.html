@@ -1,26 +1,29 @@
-<ons-page>
+<ons-page ng-controller="PlanningOperationController">
 	<ons-toolbar>
 		<div class="center">企画・運用</div>
 
 		<!-- close -->
 		<div class="left" ng-cloak>
 			<ons-toolbar-button ng-click="navi.popPage()">
-				<ons-icon icon="ion-close-round"></ons-icon>
+				<img src="images/bar_icon/close.png" alt="閉じる" class="bar_icon">
 			</ons-toolbar-button>
 		</div>
 	</ons-toolbar>
 
+	<div class="main_content">
 
 	<!-- #address -->
 	<div id="address">
 		<address>
 		<strong>企画・運用</strong><br />
-		<a href="http://www.jidaikobo.com" class="url">有限会社時代工房 - jidaikobo Inc.</a><br />
+		<a ng-click="openBrowser('http://www.jidaikobo.com')" href="javascript:void(0)" class="url">有限会社時代工房 - jidaikobo Inc.</a><br />
 		〒602-8043 京都市上京区東堀川通椹木町上ル五町目208 芳村石材ビル2F<br />
-		<span class="skiptranslate"><a href="tel:0757465710">TEL: 075-746-5710</a> / FAX: 075-746-5721 / E-mail: <a href="mailto:info@jidaikobo.com?subject=ユーメニューアプリからお問い合わせ">info@jidaikobo.com</a></span>
+		<span class="skiptranslate">
+		<a href="javascript:void(0)"  ng-click="call('0757465710')">TEL: 075-746-5710</a> / FAX: 075-746-5721 / E-mail: <a ng-click="mail('info@jidaikobo.com', 'ALEXアプリからお問い合わせ', 'ユーメニューアプリからお問い合わせ')" href="javascript:void(0)">info@jidaikobo.com</a></span>
 		</address>
 	</div>
 	<!--/ #address -->
 
+	</div>
 </ons-page>
 
